@@ -1,0 +1,18 @@
+Package: niraj9.telematics
+Type: Package
+Title: Telematics package for stat290 final project
+Description: stat290.telematics package is used to visualize and feature engineer telematics
+             data for a set of car drivers. The package will also provide the ability to 
+             create a predictive model that can uniquely identify a driver based on driving data.
+Version: 1.0
+Author: Niraj Juneja [aut],
+  Shiro Miyao [aut]
+Authors@R: c(person(given = "Niraj", family = "Juneja", role = c("aut", "cre"), email = "njuneja@gmail.com"),
+             person(given = "Shiro", family = "Miyao", role = "aut", email = "shiro-miyao@kcsg.com.sg"))
+Depends: R (>= 3.1.2)
+Imports: R6, parallel, ggplot2, gridExtra, grid, gbm, cluster
+License: CC0
+Packaged: 2015-03-18 20:41:49 UTC; niraj9
+LazyData: true
+Maintainer: Niraj Juneja <njuneja@gmail.com>
+Suggests: testthat, knitr

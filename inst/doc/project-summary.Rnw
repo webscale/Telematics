@@ -1,0 +1,281 @@
+\documentclass[a4paper]{article}
+
+\title{STAT290 Project Telematics}
+\author{Niraj Juneja, Shiro Miyao}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+
+%\VignetteIndexEntry{STAT290 Project Telematics}
+%\VignetteDepends{niraj9.telematics}
+%\VignetteKeywords{telematics}
+%\VignettePackage{niraj9.telematics}
+
+
+\maketitle
+The goal of this project is to create an R package that can visualize and feature engineer  telematics data for a set of car drivers. The package also provides the ability to create a predictive model that can uniquely identify a driver based on driving data. 
+
+<<>>=
+library(niraj9.telematics)
+@
+
+<<echo=TRUE>>=
+# a sample trip that contains the x-y coordinates of a certain
+# trip from a driver. Each row is interval of 1 second.
+
+str(sampleTrip)
+@
+
+<<>>=
+head(sampleTrip) # example of the dataset of a trip
+@
+
+\section*{1. Create features based on X-Y coordinates}
+Based on the X-Y coordinates create features for velocity, acceleration, breaks, and fast turns and speed limit breaks. Note that all the features listed are considered important for getting to a unique driver signature.
+
+\subsection*{
+1(a) velocity10
+}
+
+Calculate velocity based on moving average of 10 second intervals using trip data.
+
+<<>>=
+velocity10  # Function of velocity10
+@
+
+<<>>=
+sampleVelocity10 <- velocity10(sampleTrip) #sampleTrip dataset
+head(sampleVelocity10)
+@
+
+\subsection*{
+1(b) velocity4
+}
+
+Calculate velocity based on moving average of 4 second interval using trip data.
+
+<<>>=
+velocity4 # Function of velocity4
+@
+
+<<>>=
+sampleVelocity4 <- velocity4(sampleTrip) #sampleTrip dataset
+head(sampleVelocity4)
+@
+
+
+\subsection*{
+1(c) acceleration 
+}
+
+Calculate acceleration based on moving average of 10 seconds using trip data.
+
+<<>>=
+acceleration # Function of acceleration
+@
+
+<<>>=
+sampleAcceleration <- acceleration(sampleTrip) #sampleTrip dataset
+head(sampleAcceleration)
+@
+
+\subsection*{
+1(d) breaks 
+}
+
+Calculate breaks based on moving average of 4 seconds using trip data.
+
+<<>>=
+breaks # Function of breaks
+@
+
+<<>>=
+sampleBreaks <- breaks(sampleTrip) #sampleTrip dataset
+head(sampleBreaks)
+@
+
+\subsection*{
+1(e) MovingAverage 
+}
+
+Define the moving average.
+
+<<>>=
+MovingAverage # Function of MovingAverage
+@
+
+<<>>=
+sampleMvAvg <- MovingAverage(sampleTrip) #sampleTrip dataset
+head(sampleMvAvg)
+@
+
+
+\section*{2. Visualization of each driver trip}
+Provide functions that can visualize each driver trip.
+
+
+\subsection*{
+2(a) Plot X-Y coordinate movements for each trip
+}
+
+<<>>=
+PlotggCoordinates(trip=sampleTrip)
+@
+
+
+\subsection*{
+2(b) Plot Velocity of the driver with time
+}
+
+<<>>=
+PlotggVelocity(trip=sampleTrip)
+@
+
+Based on the different colors in the plot which is segmented by the difference in levels of velocity,we created a plot to distinguish where the drivers possibly might be.
+
+For high velocities above 75km/h which is plotted in red, we plot it as on a freeway. The blue plots with a range of more than 15km/h and less than 75km/h will most probably be on the street while the green which is <15km/h will most probably be slowing down or stopping. Please note that it is based on a moving average of 10 seconds.
+
+\subsection*{
+2(c) Plot acceleration of the driver with time
+}
+
+<<>>=
+PlotggAcceleration(trip=sampleTrip)
+@
+
+Based on the different colors in the plot which is segmented by the difference in levels of acceleration, we created a plot to see how often the driver is doing high acceleration where we defined high acceleration to be above 15 km/h2. Please note that it is based on a moving average of 10 seconds.
+
+
+\subsection*{
+2(d) Plot breaks of the driver with time
+}
+
+<<>>=
+PlotggBreaks(trip=sampleTrip)
+@
+
+The above plot is similar to plotggAcceleration but this plot is for the deceleration.
+Based on the different colors in the plot which is segmented by the difference in levels of deceleration, we created a plot to see how often the driver is doing braking where we defined high levels to be below -8 km/h2. Please note that it is based on a moving average of 4 seconds.
+
+\subsection*{
+2(e) Plot quantile charts for velocity, acceleration and breaks
+}
+
+<<>>=
+PlotggTripNow(trip=sampleTrip)
+@
+
+The above plot is a combination of the above 4 plots. (Trip movements, velocities, accceleration and breaks) On one glance, we can visualize how the trip was and what kind of driving was done during that trip.
+
+
+\section*{3. Master Summary file}
+Create a Mastersummary.csv file that summarizes data from all the trips based on the features
+created.
+
+<<>>=
+# Example,
+#
+# telematics <- Telematics$new()
+# telematics$createMasterSummary(
+#  master.file = "../data/master.csv",  
+#  file.list = "../data/fileList.csv" ,      
+#  root.folder = "../data/drivers",
+#  subset.driver.count = 10 ,
+#  cores =2)
+@
+
+<<>>=
+masterPath1 <- system.file("extdata", "master.csv", package="niraj9.telematics")
+master <- read.csv(masterPath1)
+str(master)
+@
+
+This will create a master summary file based on the features created.
+(Velocities, acceleration, breaks)
+
+\section*{4. Predictive Model that identifies a driver signature}
+Create predictive model that can
+
+a. segment drivers into various driver types
+
+b. uniquely identify a driver signature. i.e Given a new trip identify if the trip was from a
+particular driver or not.
+
+
+<<>>=
+# Example,
+#
+# d1793$createDriverSignature()
+#
+# gbm(formula = target ~ ., distribution = "gaussian", data = train, 
+#    n.trees = trees, interaction.depth = 5, shrinkage = shrinkage)
+# A gradient boosted model with gaussian loss function.
+# 100 iterations were performed.
+# There were 63 predictors of which 57 had non-zero influence.
+@
+
+
+
+\section*{5. Using R6 Class (Driver, Telematics)}
+
+Similary, methods in the Telematics and Driver class can be used to obtain the plots of the different features and also to create the master summary files. After loading the database for Telematics, users can specify which driver's information to retrieve and to refer to which trip number.
+
+
+\subsection*{
+5(a) Telematics class
+}
+
+\textbf{Methods}
+
+load                : Load the telematics database
+
+createMasterSummary : Create the master summary file of the drivers.
+
+<<>>=
+# Example,
+#
+# telematics <- Telematics$new()
+# telematics$createMasterSummary()
+#
+#  master.file = "../data/master.csv",  
+#  file.list = "../data/fileList.csv" ,      
+#  root.folder = "../data/drivers",
+#  subset.driver.count = 10 ,
+#  cores =2)
+@
+
+
+\subsection*{
+5(b) Driver class
+}
+
+\textbf{Methods}
+
+ShowTrip              : Load the telematics database
+
+ShowCoordinates       : Create the master summary file of the drivers.
+
+ShowVelocity          : plot velocity
+
+ShowAcceleration      : plot acceleration
+
+ShowBreaks            : plot breaks
+
+ShowSpeedBreaks       : plot speed breaks
+
+ShowQuantiles         : plot quantiles
+
+CreateDriverSignature : create driver's signature
+
+
+<<>>=
+# Example,
+# 
+# telematics$load(verbose = FALSE)
+# d1793 = Driver$new(db = telematics, driver.name = "1793")
+# d1793$ShowTrip("55")
+@
+
+\end{document}

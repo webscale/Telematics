@@ -1,0 +1,85 @@
+---
+output: html_document
+---
+#Telematics Package Examples
+
+This document shows the usage scenarios for the Telematics package. Their are two entry points to using the package.
+* 1) If you do not have a Master Summary File created and you want to create One
+* 2) If you have a Master Summary File and you want to load it and do some analysis
+
+
+
+Defining some variable
+```{r}
+library(package = "niraj9.telematics")
+public.folder = "/home/niraj9/public/"
+master.file.3 = paste(public.folder , "master-3.csv" , sep = "")
+master.file.4 = paste(public.folder , "master-4.csv" , sep = "")
+
+```
+
+## Scenario 1 - Create a Master Summary File
+```{r}
+telematics <- Telematics$new(master.file.4)
+arun = telematics$CreateMasterSummary(file.list = "/home/niraj9/public/fileList.csv" ,
+                                         root.folder = "/home/niraj9/public/drivers/",
+                                         subset.driver.count = 30 ,
+                                         cores =4)
+```
+
+
+## Scenario 2 - Load an existing Master Summary File
+
+```{r, echo=FALSE}
+telematics <- Telematics$new(master.file.3)
+telematics$load(verbose = FALSE)
+```
+
+## Driver Analysis - Example 1 - Show Drivers loaded
+
+```{r}
+telematics$drivers()
+
+```
+
+Load a Driver
+```{r}
+driver = Driver$new(db = telematics , driver.name = "2751")
+driver$summary()
+```
+
+## Driver Analysis - Example 2 - Show Driver Graphs
+
+```{r}
+q =driver$ShowCoordinates(trip = 165)
+q =driver$ShowVelocity(trip = 165)
+q =driver$ShowAcceleration(trip = 165)
+q =driver$ShowBreaks(trip = 165)
+q=driver$ShowQuantiles(trip = 111)
+q=driver$ShowSpeedBreaks(trip = 120)
+
+```
+
+## Driver Analysis - Example 3 - Driver Signature Predictive Model
+Create a Unique Driver Signature. i.e a GBM Model that can identify a driver
+```{r}
+model = driver$CreateDriverSignature()
+summary(model)
+
+```
+
+## Driver Analysis - Example 4 - Driver Class Predictive Model
+Use  the Telematics class to segment the drivers into 5 driver classes
+```{r}
+fit <- telematics$SegmentDrivers(segments = 5)
+summary(fit)
+
+```
+
+Visualize the Driver Clusters
+```{r}
+telematics$VisualizeSegments()
+
+```
+
+

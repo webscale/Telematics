@@ -1,0 +1,5 @@
+telematicsCreate      R Code for creating a new master summary file
+driverPlots           R code for plotting trips onto graphs
+driverModel           R code to create the driver signature
+segmentationModel     R code to create the segmentation model(k-means) for driver class
+
